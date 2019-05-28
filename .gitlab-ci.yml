@@ -2,13 +2,9 @@ stages:
   - test
   - build
 
-cache:
-  paths:
-    - /go/src/github.com
-    - /go/src/golang.org
-
 before_script:
-  - export PATH=$PATH:/usr/local/go/bin
+  - export GOPATH=~/go
+  - export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
   - export CC=clang-5.0
   - make dep
 
