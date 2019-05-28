@@ -8,6 +8,7 @@ cache:
     - /go/src/golang.org
 
 before_script:
+  - export PATH=$PATH:/usr/local/go/bin
   - export CC=clang-5.0
   - make dep
 
