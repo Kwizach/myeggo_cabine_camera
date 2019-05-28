@@ -1,5 +1,5 @@
 stages:
-  - tests
+  - test
   - build
 
 cache:
@@ -10,7 +10,6 @@ cache:
 before_script:
   - export CC=clang-5.0
   - make dep
-
 
 unit_tests:
   stage: test
