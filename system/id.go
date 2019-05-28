@@ -6,9 +6,11 @@ import (
 	"os/exec"
 )
 
+var myID string
+
 // MyID returns the RPI ID
 func MyID() string {
-	return "ID"
+	return myID
 }
 
 // IsDefaultHostName Check if the name of the RPI is the default name
@@ -42,6 +44,8 @@ func CreateNewHostName() error {
 		fmt.Println("Error in changeHostNameCtl")
 		return err
 	}
+
+	myID = newName
 
 	return nil
 }
