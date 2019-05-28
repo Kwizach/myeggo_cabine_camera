@@ -1,0 +1,28 @@
+stages:
+  - tests
+  - build
+
+cache:
+  paths:
+    - /go/src/github.com
+    - /go/src/golang.org
+
+before_script:
+  - export CC=clang-5.0
+  - make dep
+
+
+unit_tests:
+  stage: test
+  script:
+    - make test
+
+lint_code:
+  stage: test
+  script:
+    - make lint
+
+build:
+  stage: build
+  script:
+    - make
