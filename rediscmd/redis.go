@@ -3,7 +3,6 @@ package rediscmd
 import (
 	"errors"
 	"fmt"
-	"rpi-client/system"
 	"strings"
 	"time"
 )
@@ -22,8 +21,6 @@ var (
 )
 
 func init() {
-	myID = system.MyID()
-
 	// START
 	allCommands["START"] = func(_ []string) error {
 		when := fmt.Sprintf("%f", float64(time.Now().UnixNano())/1e9)
@@ -41,20 +38,21 @@ func init() {
 }
 
 // SubRedis subscribe to Redis pubsub and manage incoming messages
-func SubRedis() {
+func SubRedis(rpiID string) error {
+	myID = rpiID
+
 	var err error
 	// Connect to Redis
 	service, err = ConnectRedis(redisURL)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	// Subscribe to channelIN and wait for messages
 	// This function won't exit until there is an error
 	err = service.SubAndManage(onMsg, channelIN)
 	fmt.Println(err)
 	// We are done... unsubscribe
-	service.Unsubscribe()
+	return service.Unsubscribe()
 }
 
 func onMsg(channel string, message string) error {

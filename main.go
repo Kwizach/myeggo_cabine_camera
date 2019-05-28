@@ -14,5 +14,5 @@ func main() {
 		}
 	}
 
-	rediscmd.SubRedis()
+	rediscmd.SubRedis(system.MyID())
 }

@@ -22,7 +22,7 @@ func init() {
 func reboot() error {
 	cmd := exec.Command("reboot")
 	if err := cmd.Run(); err != nil {
-		return rpiMsgWithError("Error while tryring to reboot", err)
+		return rpiMsgWithError("Error while trying to reboot", err)
 	}
 	// returning error will stop the program
 	return errors.New("Rebooting RPI")
@@ -32,7 +32,7 @@ func reboot() error {
 func shutdown() error {
 	cmd := exec.Command("shutdown", "now")
 	if err := cmd.Run(); err != nil {
-		return rpiMsgWithError("Error while tryring to shutdown", err)
+		return rpiMsgWithError("Error while trying to shutdown", err)
 	}
 	// returning error will stop the program
 	return errors.New("Shutting Down RPI")
@@ -56,7 +56,7 @@ func light(action string) error {
 	}
 
 	if err := cmd.Run(); err != nil {
-		return rpiMsgWithError(fmt.Sprintf("Error while tryring to LIGHT %s :", action), err)
+		return rpiMsgWithError(fmt.Sprintf("Error while trying to LIGHT %s :", action), err)
 	}
 
 	return nil
