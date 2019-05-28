@@ -21,21 +21,25 @@ func IsDefaultHostName() bool {
 
 // CreateNewHostName Set the a new random name, based on a uuid to the RPI
 func CreateNewHostName() error {
-	cpuID, err := exec.Command("sh", "-c", "cat /proc/cpuinfo | grep Serial | cut -d':' -f2 | tr -d ' '").Output()
+	cpuID, err := exec.Command("sh", "-c", "cat /proc/cpuinfo | grep Serial | cut -d':' -f2 | tr -d ' ' | tr -d '\n'").Output()
 	if err != nil {
+		fmt.Println("Error in getting cpuID")
 		return err
 	}
 	newName := fmt.Sprintf("rpi-%s", cpuID)
 
 	if err = changeEtcHosts(newName); err != nil {
+		fmt.Println("Error in changeEtcHosts")
 		return err
 	}
 
 	if err = changeEtcHostname(newName); err != nil {
+		fmt.Println("Error in changeEtcHostname")
 		return err
 	}
 
 	if err = changeHostNameCtl(newName); err != nil {
+		fmt.Println("Error in changeHostNameCtl")
 		return err
 	}
 
