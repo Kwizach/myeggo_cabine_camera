@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"rpi-client/rediscmd"
 	"rpi-client/system"
 )
@@ -8,7 +9,9 @@ import (
 func main() {
 	// Check if the RPI has default hostname
 	if system.IsDefaultHostName() {
-		system.CreateNewHostName()
+		if err := system.CreateNewHostName(); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	rediscmd.SubRedis()

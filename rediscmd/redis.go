@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	redisURL   string = "redis://localhost:6379/"
+	redisURL   string = "redis://redis.myeggo.com:6379/"
 	channelIN  string = "commands"
 	channelOUT string = "out"
 )
