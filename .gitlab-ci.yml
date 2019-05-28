@@ -5,7 +5,6 @@ stages:
 before_script:
   - export GOPATH=~/go
   - export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
-  - export CC=clang-5.0
   - make dep
 
 unit_tests:
