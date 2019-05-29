@@ -1,10 +1,13 @@
 package system
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 )
+
+const defaultHostname = "raspberrypi"
 
 var myID string
 
@@ -16,31 +19,48 @@ func MyID() string {
 // IsDefaultHostName Check if the name of the RPI is the default name
 func IsDefaultHostName() bool {
 	if name, err := os.Hostname(); err == nil {
-		return name == "raspberrypi"
+		return name == defaultHostname
 	}
 	return true
 }
 
 // CreateNewHostName Set the a new random name, based on a uuid to the RPI
 func CreateNewHostName() error {
-	cpuID, err := exec.Command("sh", "-c", "cat /proc/cpuinfo | grep Serial | cut -d':' -f2 | tr -d ' ' | tr -d '\n'").Output()
+	newName, err := getCPUSerial()
 	if err != nil {
-		fmt.Println("Error in getting cpuID")
 		return err
 	}
-	newName := fmt.Sprintf("rpi-%s", cpuID)
+	if newName == "rpi-" {
+		return errors.New("Can't retrieve CPU serial")
+	}
 
-	if err = changeEtcHosts(newName); err != nil {
+	return changeHostName(newName)
+}
+
+func getCPUSerial() (string, error) {
+	cpuID, err := exec.Command("sh", "-c", "cat /proc/cpuinfo | grep Serial | cut -d':' -f2 | tr -d ' ' | tr -d '\n'").Output()
+
+	if err != nil {
+		fmt.Println("Error in getting cpuID")
+		return "", err
+	}
+
+	return fmt.Sprintf("rpi-%s", cpuID), nil
+}
+
+func changeHostName(newName string) error {
+
+	if err := changeEtcHosts(newName); err != nil {
 		fmt.Println("Error in changeEtcHosts")
 		return err
 	}
 
-	if err = changeEtcHostname(newName); err != nil {
+	if err := changeEtcHostname(newName); err != nil {
 		fmt.Println("Error in changeEtcHostname")
 		return err
 	}
 
-	if err = changeHostNameCtl(newName); err != nil {
+	if err := changeHostNameCtl(newName); err != nil {
 		fmt.Println("Error in changeHostNameCtl")
 		return err
 	}
