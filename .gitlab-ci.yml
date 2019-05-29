@@ -21,3 +21,7 @@ build:
   stage: build
   script:
     - make
+  artifacts:
+    paths:
+    - rpi-client
+    expire_in: 1 week
