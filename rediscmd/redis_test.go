@@ -19,6 +19,7 @@ func TestSubRedis(t *testing.T) {
 	time.Sleep(2019 * time.Millisecond)
 	if service != nil {
 		service.Unsubscribe(channelIN)
+		service.client.Close()
 	}
 
 	if myID != str {
@@ -49,6 +50,7 @@ func TestOnMsg(t *testing.T) {
 	if errOUT != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
+	defer service.client.Close()
 	defer service.Unsubscribe(channelIN, channelOUT)
 
 	go func() {
@@ -118,13 +120,14 @@ func TestRpiMsg(t *testing.T) {
 	var err error
 	service, err = ConnectRedis(redisURL)
 	if err != nil {
-		t.Errorf("TestOnMsg can't ConnectRedis")
+		t.Errorf("TestRpiMsg can't ConnectRedis")
 	}
 
 	chTOUT, errOUT := service.subscribe(channelOUT)
 	if errOUT != nil {
-		t.Errorf("TestOnMsg can't subscribe")
+		t.Errorf("TestRpiMsg can't subscribe")
 	}
+	defer service.client.Close()
 	defer service.Unsubscribe(channelOUT)
 
 	time.Sleep(2019 * time.Millisecond)
@@ -139,19 +142,20 @@ func TestRpiMsgWithError(t *testing.T) {
 	var err error
 	service, err = ConnectRedis(redisURL)
 	if err != nil {
-		t.Errorf("TestOnMsg can't ConnectRedis")
+		t.Errorf("TestRpiMsgWithError can't ConnectRedis")
 	}
 
 	chTOUT, errOUT := service.subscribe(channelOUT)
 	if errOUT != nil {
-		t.Errorf("TestOnMsg can't subscribe")
+		t.Errorf("TestRpiMsgWithError can't subscribe")
 	}
+	defer service.client.Close()
 	defer service.Unsubscribe(channelOUT)
 
 	time.Sleep(2019 * time.Millisecond)
 	rpiMsgWithError("TEST_MSG", errors.New("WITH ERROR"))
 	msgI := <-chTOUT
 	if msgI.Payload != "RPI [] - TEST_MSG WITH ERROR" {
-		t.Errorf("rpiMsg failed")
+		t.Errorf("rpiMsgWithError failed")
 	}
 }
