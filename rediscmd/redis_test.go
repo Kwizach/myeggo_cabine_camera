@@ -72,9 +72,9 @@ func TestOnMsg(t *testing.T) {
 					}
 				case "", "TEST_UNKNOWN":
 					if msgI.Payload == "TEST_UNKNOWN" {
-						wait4OUT = "RPI [] - Unknown command: TEST_UNKNOWN"
+						wait4OUT = "RPI [TEST] - Unknown command: TEST_UNKNOWN"
 					} else {
-						wait4OUT = "RPI [] - Received empty command"
+						wait4OUT = "RPI [TEST] - Received empty command"
 					}
 					errO := onMsg(msgI.Channel, msgI.Payload)
 					if errO != nil {
@@ -130,7 +130,7 @@ func TestRpiMsg(t *testing.T) {
 	time.Sleep(2019 * time.Millisecond)
 	rpiMsg("TEST_MSG")
 	msgI := <-chTOUT
-	if msgI.Payload != "RPI [] - TEST_MSG" {
+	if msgI.Payload != "RPI [TEST] - TEST_MSG" {
 		t.Errorf("rpiMsg failed")
 	}
 }
@@ -151,7 +151,7 @@ func TestRpiMsgWithError(t *testing.T) {
 	time.Sleep(2019 * time.Millisecond)
 	rpiMsgWithError("TEST_MSG", errors.New("WITH ERROR"))
 	msgI := <-chTOUT
-	if msgI.Payload != "RPI [] - TEST_MSG WITH ERROR" {
+	if msgI.Payload != "RPI [TEST] - TEST_MSG WITH ERROR" {
 		t.Errorf("rpiMsgWithError failed")
 	}
 }
