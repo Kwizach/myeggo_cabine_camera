@@ -11,7 +11,7 @@ lint: ## Lint the files
 	@golint -set_exit_status ./...
 
 test: ## Run unittests
-	@go test -short ${PKG_LIST}
+	@go test -v -short ${PKG_LIST}
 
 dep: ## Get the dependencies
 	@go get -v -d ./...

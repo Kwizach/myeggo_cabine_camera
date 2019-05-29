@@ -9,6 +9,7 @@ import (
 
 func TestSubRedis(t *testing.T) {
 	str := "TEST"
+
 	go func() {
 		err := SubRedis(str)
 		if err != nil {
@@ -17,7 +18,7 @@ func TestSubRedis(t *testing.T) {
 	}()
 	time.Sleep(2019 * time.Millisecond)
 	if service != nil {
-		service.Unsubscribe()
+		service.Unsubscribe(channelIN)
 	}
 
 	if myID != str {
@@ -48,8 +49,7 @@ func TestOnMsg(t *testing.T) {
 	if errOUT != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
-	defer service.Unsubscribe(channelIN)
-	defer service.Unsubscribe(channelOUT)
+	defer service.Unsubscribe(channelIN, channelOUT)
 
 	go func() {
 		var (
@@ -81,14 +81,13 @@ func TestOnMsg(t *testing.T) {
 						// check that publish is done
 						// retrieve it with chTOUT
 						t.Errorf("onMsg TEST_UNKNOWN Publish failed")
-						err = errors.New("test failed")
+						err = errors.New("TEST4 failed")
 					}
 				}
 			case msgO := <-chTOUT:
-				fmt.Println(msgO.Payload)
-				fmt.Println(wait4OUT)
 				if msgO.Payload != wait4OUT {
 					t.Errorf("onMsg TEST_UNKNOWN Received failed")
+					err = errors.New("TEST4 failed")
 				}
 			}
 		}
@@ -113,7 +112,6 @@ func TestOnMsg(t *testing.T) {
 			service.Publish(channelIN, "")
 		})
 	})
-	time.Sleep(2019 * time.Millisecond)
 }
 
 func TestRpiMsg(t *testing.T) {

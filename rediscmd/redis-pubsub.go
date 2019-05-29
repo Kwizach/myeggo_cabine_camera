@@ -77,7 +77,7 @@ func (service *Service) SubAndManage(onMsg func(string, string) error, channels 
 // Unsubscribe from channels
 func (service *Service) Unsubscribe(channels ...string) error {
 	if service.pubSub != nil {
-		defer service.pubSub.Close()
+		//defer service.pubSub.Close()
 		return service.pubSub.Unsubscribe(channels...)
 	}
 	return errors.New("There is no Subscription to unsubscribe from")
