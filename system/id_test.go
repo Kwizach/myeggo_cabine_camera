@@ -30,11 +30,13 @@ func TestChangeHostName(t *testing.T) {
 	err := changeHostName(defaultHostname)
 	if err != nil {
 		t.Errorf("Can't set hostname to raspberrypi")
+		return
 	}
 
 	err = CreateNewHostName()
 	if err != nil {
 		t.Errorf("Can't set new hostname based on cpuInfo")
+		return
 	}
 
 	if IsDefaultHostName() {
