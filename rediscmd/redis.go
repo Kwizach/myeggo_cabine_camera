@@ -58,7 +58,7 @@ func SubRedis(rpiID string) error {
 func onMsg(channel string, message string) error {
 	if channel == channelIN {
 		msgs := strings.Split(message, " ")
-		if len(msgs) > 0 {
+		if msgs[0] != "" {
 			if _, ok := allCommands[msgs[0]]; ok {
 				// If there are parameters
 				if len(msgs[1:]) > 0 {
@@ -71,7 +71,7 @@ func onMsg(channel string, message string) error {
 			return rpiMsg(fmt.Sprintf("Unknown command: %s", message))
 		}
 		// Empty command
-		return rpiMsg(fmt.Sprintf("Received empty command: %s", message))
+		return rpiMsg("Received empty command")
 	}
 	return nil
 }
