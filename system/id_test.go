@@ -37,7 +37,7 @@ func TestChangeHostName(t *testing.T) {
 		t.Errorf("Can't set new hostname based on cpuInfo")
 	}
 
-	if TestIsDefaultHostName() {
+	if IsDefaultHostName() {
 		t.Errorf("Hostname is still default")
 	}
 }
