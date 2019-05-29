@@ -19,7 +19,6 @@ func TestSubRedis(t *testing.T) {
 	time.Sleep(2019 * time.Millisecond)
 	if service != nil {
 		service.Unsubscribe(channelIN)
-		service.client.Close()
 	}
 
 	if myID != str {
@@ -36,11 +35,11 @@ func TestOnMsg(t *testing.T) {
 		return fmt.Errorf("Success TEST2 %s %s", params[0], params[1])
 	}
 
-	var errC error
-	service, errC = ConnectRedis(redisURL)
-	if errC != nil {
-		t.Errorf("TestOnMsg can't ConnectRedis")
-	}
+	// var errC error
+	// service, errC = ConnectRedis(redisURL)
+	// if errC != nil {
+	// 	t.Errorf("TestOnMsg can't ConnectRedis")
+	// }
 
 	chTIN, errIN := service.subscribe(channelIN)
 	if errIN != nil {
@@ -50,7 +49,6 @@ func TestOnMsg(t *testing.T) {
 	if errOUT != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
-	defer service.client.Close()
 	defer service.Unsubscribe(channelIN, channelOUT)
 
 	go func() {
@@ -117,17 +115,16 @@ func TestOnMsg(t *testing.T) {
 }
 
 func TestRpiMsg(t *testing.T) {
-	var err error
-	service, err = ConnectRedis(redisURL)
-	if err != nil {
-		t.Errorf("TestRpiMsg can't ConnectRedis")
-	}
+	// var err error
+	// service, err = ConnectRedis(redisURL)
+	// if err != nil {
+	// 	t.Errorf("TestRpiMsg can't ConnectRedis")
+	// }
 
 	chTOUT, errOUT := service.subscribe(channelOUT)
 	if errOUT != nil {
 		t.Errorf("TestRpiMsg can't subscribe")
 	}
-	defer service.client.Close()
 	defer service.Unsubscribe(channelOUT)
 
 	time.Sleep(2019 * time.Millisecond)
@@ -139,17 +136,16 @@ func TestRpiMsg(t *testing.T) {
 }
 
 func TestRpiMsgWithError(t *testing.T) {
-	var err error
-	service, err = ConnectRedis(redisURL)
-	if err != nil {
-		t.Errorf("TestRpiMsgWithError can't ConnectRedis")
-	}
+	// var err error
+	// service, err = ConnectRedis(redisURL)
+	// if err != nil {
+	// 	t.Errorf("TestRpiMsgWithError can't ConnectRedis")
+	// }
 
 	chTOUT, errOUT := service.subscribe(channelOUT)
 	if errOUT != nil {
 		t.Errorf("TestRpiMsgWithError can't subscribe")
 	}
-	defer service.client.Close()
 	defer service.Unsubscribe(channelOUT)
 
 	time.Sleep(2019 * time.Millisecond)
