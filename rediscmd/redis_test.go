@@ -93,7 +93,7 @@ func TestOnMsg(t *testing.T) {
 			}
 		}
 	}()
-	time.Sleep(555 * time.Millisecond)
+	time.Sleep(2019 * time.Millisecond)
 
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
@@ -129,7 +129,7 @@ func TestRpiMsg(t *testing.T) {
 	}
 	defer service.Unsubscribe(channelOUT)
 
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(2019 * time.Millisecond)
 	rpiMsg("TEST_MSG")
 	msgI := <-chTOUT
 	if msgI.Payload != "RPI [] - TEST_MSG" {
@@ -150,7 +150,7 @@ func TestRpiMsgWithError(t *testing.T) {
 	}
 	defer service.Unsubscribe(channelOUT)
 
-	time.Sleep(555 * time.Millisecond)
+	time.Sleep(2019 * time.Millisecond)
 	rpiMsgWithError("TEST_MSG", errors.New("WITH ERROR"))
 	msgI := <-chTOUT
 	if msgI.Payload != "RPI [] - TEST_MSG WITH ERROR" {
