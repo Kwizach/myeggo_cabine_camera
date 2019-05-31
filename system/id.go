@@ -64,6 +64,11 @@ func changeHostName(newName string) error {
 		return err
 	}
 
+	if err := restartAvahiDaemon(); err != nil {
+		fmt.Println("Error in restartAvahiDaemon")
+		return err
+	}
+
 	myID = newName
 
 	return nil
@@ -79,6 +84,8 @@ func changeHostNameCtl(name string) error {
 	return exec.Command("sh", "-c", fmt.Sprintf("hostnamectl set-hostname \"%s\"", name)).Run()
 }
 
-// 4) Restart the mDNS daemon
-// To be able to use mynewhostname.local from other machines, we need to restart the mDNS daemon to respond to the new hostname.
-// sudo systemctl restart avahi-daemon
+func restartAvahiDaemon() error {
+	// To be able to use mynewhostname.local from other machines,
+	// we need to restart the mDNS daemon to respond to the new hostname.
+	return exec.Command("sh", "-c", "systemctl restart avahi-daemon").Run()
+}
