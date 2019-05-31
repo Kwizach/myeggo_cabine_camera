@@ -11,9 +11,14 @@ func TestMyID(t *testing.T) {
 	}
 }
 
-func TestIsDefaultHostName(t *testing.T) {
-	if IsDefaultHostName() {
-		t.Errorf("IsDefaultHostName should not be raspberrypi")
+func TestIsGoodHostName(t *testing.T) {
+	if !IsGoodHostName() {
+		goodHostname, err := getCPUSerial()
+		if err != nil {
+			t.Errorf("Can't retriever CPUSerial")
+			return
+		}
+		t.Errorf("IsGoodHostName should be %s", goodHostname)
 	}
 }
 
@@ -27,9 +32,9 @@ func TestGetCPUSerial(t *testing.T) {
 }
 
 func TestChangeHostName(t *testing.T) {
-	err := changeHostName(defaultHostname)
+	err := changeHostName("rpi-test")
 	if err != nil {
-		t.Errorf("Can't set hostname to raspberrypi")
+		t.Errorf("Can't set hostname to rpi-test")
 		return
 	}
 
@@ -39,7 +44,7 @@ func TestChangeHostName(t *testing.T) {
 		return
 	}
 
-	if IsDefaultHostName() {
+	if !IsGoodHostName() {
 		t.Errorf("Hostname is still default")
 	}
 }

@@ -8,9 +8,10 @@ import (
 
 func main() {
 	// Check if the RPI has default hostname
-	if system.IsDefaultHostName() {
+	if !system.IsGoodHostName() {
 		if err := system.CreateNewHostName(); err != nil {
 			fmt.Println(err)
+			return
 		}
 	}
 

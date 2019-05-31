@@ -7,8 +7,6 @@ import (
 	"os/exec"
 )
 
-const defaultHostname = "raspberrypi"
-
 var myID string
 
 // MyID returns the RPI ID
@@ -16,12 +14,13 @@ func MyID() string {
 	return myID
 }
 
-// IsDefaultHostName Check if the name of the RPI is the default name
-func IsDefaultHostName() bool {
+// IsGoodHostName Check if the name of the RPI is the default name
+func IsGoodHostName() bool {
 	if name, err := os.Hostname(); err == nil {
-		return name == defaultHostname
+		goodHostname, _ := getCPUSerial()
+		return name == goodHostname
 	}
-	return true
+	return false
 }
 
 // CreateNewHostName Set the a new random name, based on a uuid to the RPI
