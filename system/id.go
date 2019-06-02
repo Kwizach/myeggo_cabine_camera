@@ -7,17 +7,20 @@ import (
 	"os/exec"
 )
 
-var myID string
+var cpuID string
 
 // MyID returns the RPI ID
 func MyID() string {
-	return myID
+	return "rpi-" + cpuID
 }
 
-// IsGoodHostName Check if the name of the RPI is the default name
-func IsGoodHostName() bool {
+// IsHostNameGood Check if the name of the RPI is the default name
+func IsHostNameGood() bool {
 	if name, err := os.Hostname(); err == nil {
-		goodHostname, _ := getCPUSerial()
+		goodHostname, err := getGoodName()
+		if err != nil {
+			return false
+		}
 		return name == goodHostname
 	}
 	return false
@@ -25,51 +28,55 @@ func IsGoodHostName() bool {
 
 // CreateNewHostName Set the a new random name, based on a uuid to the RPI
 func CreateNewHostName() error {
-	newName, err := getCPUSerial()
+	newName, err := getGoodName()
 	if err != nil {
 		return err
 	}
 	if newName == "rpi-" {
-		return errors.New("Can't retrieve CPU serial")
+		return errors.New("[id.CreateNewHostName] Can't retrieve CPU serial")
 	}
 
 	return changeHostName(newName)
 }
 
-func getCPUSerial() (string, error) {
-	cpuID, err := exec.Command("sh", "-c", "cat /proc/cpuinfo | grep Serial | cut -d':' -f2 | tr -d ' ' | tr -d '\n'").Output()
-
+func getGoodName() (string, error) {
+	_, err := getCPUSerial()
 	if err != nil {
-		fmt.Println("Error in getting cpuID")
 		return "", err
 	}
+	return MyID(), nil
+}
 
-	return fmt.Sprintf("rpi-%s", cpuID), nil
+func getCPUSerial() ([]byte, error) {
+	if cpuID != "" {
+		return []byte(cpuID), nil
+	}
+
+	cpuInfo, err := exec.Command("sh", "-c", "cat /proc/cpuinfo | grep Serial | cut -d':' -f2 | tr -d ' ' | tr -d '\n'").Output()
+	if err != nil {
+		return nil, err
+	}
+	cpuID = string(cpuInfo)
+
+	return cpuInfo, nil
 }
 
 func changeHostName(newName string) error {
-
 	if err := changeEtcHosts(newName); err != nil {
-		fmt.Println("Error in changeEtcHosts")
 		return err
 	}
 
 	if err := changeEtcHostname(newName); err != nil {
-		fmt.Println("Error in changeEtcHostname")
 		return err
 	}
 
 	if err := changeHostNameCtl(newName); err != nil {
-		fmt.Println("Error in changeHostNameCtl")
 		return err
 	}
 
 	if err := restartAvahiDaemon(); err != nil {
-		fmt.Println("Error in restartAvahiDaemon")
 		return err
 	}
-
-	myID = newName
 
 	return nil
 }

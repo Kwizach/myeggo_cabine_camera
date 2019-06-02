@@ -5,28 +5,28 @@ import (
 )
 
 func TestMyID(t *testing.T) {
-	myID = "toto"
-	if MyID() != myID {
+	cpuID = "toto"
+	if MyID() != "rpi-"+cpuID {
 		t.Errorf("MyID should return myID")
 	}
 }
 
-func TestIsGoodHostName(t *testing.T) {
-	if !IsGoodHostName() {
+func TestIsHostNameGood(t *testing.T) {
+	if !IsHostNameGood() {
 		goodHostname, err := getCPUSerial()
 		if err != nil {
 			t.Errorf("Can't retriever CPUSerial")
 			return
 		}
-		t.Errorf("IsGoodHostName should be %s", goodHostname)
+		t.Errorf("IsHostNameGood should be %s", goodHostname)
 	}
 }
 
 func TestCreateNewHostName(t *testing.T) {}
 
 func TestGetCPUSerial(t *testing.T) {
-	newName, err := getCPUSerial()
-	if err != nil || newName == "rpi-" {
+	_, err := getCPUSerial()
+	if err != nil {
 		t.Errorf("Can't retrieve CPU serial")
 	}
 }
@@ -44,7 +44,7 @@ func TestChangeHostName(t *testing.T) {
 		return
 	}
 
-	if !IsGoodHostName() {
+	if !IsHostNameGood() {
 		t.Errorf("Hostname is still default")
 	}
 }
