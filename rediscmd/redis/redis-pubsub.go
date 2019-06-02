@@ -1,4 +1,4 @@
-package rediscmd
+package redis
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ type Service struct {
 }
 
 // ConnectRedis to server and create a service
-func ConnectRedis(url string) (*Service, error) {
+func connectRedis(url string) (*Service, error) {
 	opt, err := redis.ParseURL(url)
 	if err != nil {
 		return nil, errors.New("Connect: Can't parse redis url")
@@ -57,12 +57,12 @@ func (service *Service) subscribe(channels ...string) (<-chan *redis.Message, er
 
 // SubAndManage subscribe and manage incoming messages from subscribed channels
 // Returns when onMsg is not nil (returns an error)
-func (service *Service) SubAndManage(onMsg func(string, string) error, channels ...string) error {
+func (service *Service) subAndManage(onMsg func(string, string) error, channels ...string) error {
 	ch, err := service.subscribe(channels...)
 	if err != nil {
 		return err
 	}
-	defer service.Unsubscribe(channels...)
+	defer service.unsubscribe(channels...)
 
 	for err == nil {
 		select {
@@ -75,7 +75,7 @@ func (service *Service) SubAndManage(onMsg func(string, string) error, channels 
 }
 
 // Unsubscribe from channels
-func (service *Service) Unsubscribe(channels ...string) error {
+func (service *Service) unsubscribe(channels ...string) error {
 	if service.pubSub != nil {
 		//defer service.pubSub.Close()
 		return service.pubSub.Unsubscribe(channels...)
@@ -84,6 +84,6 @@ func (service *Service) Unsubscribe(channels ...string) error {
 }
 
 // Publish publish key value to a PubSub channel
-func (service *Service) Publish(channel string, value string) error {
+func (service *Service) publish(channel string, value string) error {
 	return service.client.Publish(channel, value).Err()
 }

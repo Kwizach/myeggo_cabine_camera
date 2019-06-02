@@ -1,4 +1,4 @@
-package rediscmd
+package redis
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ func TestSubRedis(t *testing.T) {
 	}()
 	time.Sleep(2019 * time.Millisecond)
 	if service != nil {
-		service.Unsubscribe(channelIN)
+		service.unsubscribe(channelIN)
 	}
 
 	if myID != str {
@@ -28,10 +28,10 @@ func TestSubRedis(t *testing.T) {
 
 func TestOnMsg(t *testing.T) {
 	errTest1 := errors.New("SUCCESS TEST1")
-	allCommands["TEST1"] = func(_ []string) error {
+	AllCommands["TEST1"] = func(_ []string) error {
 		return errTest1
 	}
-	allCommands["TEST2"] = func(params []string) error {
+	AllCommands["TEST2"] = func(params []string) error {
 		return fmt.Errorf("Success TEST2 %s %s", params[0], params[1])
 	}
 
@@ -43,7 +43,7 @@ func TestOnMsg(t *testing.T) {
 	if errOUT != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
-	defer service.Unsubscribe(channelIN, channelOUT)
+	defer service.unsubscribe(channelIN, channelOUT)
 
 	go func() {
 		var (
@@ -90,20 +90,20 @@ func TestOnMsg(t *testing.T) {
 
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
-			service.Publish(channelIN, "TEST1")
+			service.publish(channelIN, "TEST1")
 		})
 		t.Run("Test2", func(t *testing.T) {
-			service.Publish(channelIN, "TEST2 is successfull")
+			service.publish(channelIN, "TEST2 is successfull")
 		})
 		t.Run("Test3", func(t *testing.T) {
-			service.Publish(channelIN, "TEST1 with 4 useless parameters")
+			service.publish(channelIN, "TEST1 with 4 useless parameters")
 		})
 		t.Run("Test4", func(t *testing.T) {
-			service.Publish(channelIN, "TEST_UNKNOWN")
+			service.publish(channelIN, "TEST_UNKNOWN")
 		})
 		t.Run("Test5", func(t *testing.T) {
 			time.Sleep(555 * time.Millisecond)
-			service.Publish(channelIN, "")
+			service.publish(channelIN, "")
 		})
 	})
 }
@@ -114,28 +114,28 @@ func TestRpiMsg(t *testing.T) {
 	if errOUT != nil {
 		t.Errorf("TestRpiMsg can't subscribe")
 	}
-	defer service.Unsubscribe(channelOUT)
+	defer service.unsubscribe(channelOUT)
 
 	time.Sleep(2019 * time.Millisecond)
-	rpiMsg("TEST_MSG")
+	RpiMsg("TEST_MSG")
 	msgI := <-chTOUT
 	if msgI.Payload != "RPI [TEST] - TEST_MSG" {
 		t.Errorf("rpiMsg failed")
 	}
 }
 
-func TestRpiMsgWithError(t *testing.T) {
+func TestLog(t *testing.T) {
 
 	chTOUT, errOUT := service.subscribe(channelOUT)
 	if errOUT != nil {
-		t.Errorf("TestRpiMsgWithError can't subscribe")
+		t.Errorf("TestLog can't subscribe")
 	}
-	defer service.Unsubscribe(channelOUT)
+	defer service.unsubscribe(channelOUT)
 
 	time.Sleep(2019 * time.Millisecond)
-	rpiMsgWithError("TEST_MSG", errors.New("WITH ERROR"))
+	Log("TEST_MSG", errors.New("WITH ERROR"))
 	msgI := <-chTOUT
 	if msgI.Payload != "RPI [TEST] - TEST_MSG WITH ERROR" {
-		t.Errorf("rpiMsgWithError failed")
+		t.Errorf("TestLog failed")
 	}
 }

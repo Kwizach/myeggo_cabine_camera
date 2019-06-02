@@ -1,4 +1,4 @@
-package rediscmd
+package redis
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestConnectRedis(t *testing.T) {
-	service, err := ConnectRedis(redisURL)
+	service, err := connectRedis(redisURL)
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
 			if err != nil {
@@ -24,10 +24,10 @@ func TestConnectRedis(t *testing.T) {
 }
 
 func TestSubscribe(t *testing.T) {
-	service, _ := ConnectRedis(redisURL)
+	service, _ := connectRedis(redisURL)
 	ch, errs := service.subscribe(channelIN)
 
-	service.Publish(channelIN, "STOP")
+	service.publish(channelIN, "STOP")
 	msg := <-ch
 
 	t.Run("group", func(t *testing.T) {
@@ -43,11 +43,11 @@ func TestSubscribe(t *testing.T) {
 		})
 	})
 
-	service.Unsubscribe(channelIN)
+	service.unsubscribe(channelIN)
 }
 
 func TestSubAndManage(t *testing.T) {
-	service, _ := ConnectRedis(redisURL)
+	service, _ := connectRedis(redisURL)
 
 	errorOK := errors.New("STOP Listening")
 
@@ -60,10 +60,10 @@ func TestSubAndManage(t *testing.T) {
 
 	go func() {
 		time.Sleep(500 * time.Millisecond)
-		service.Publish(channelIN, "STOP")
+		service.publish(channelIN, "STOP")
 	}()
 
-	err := service.SubAndManage(onMsg, channelIN)
+	err := service.subAndManage(onMsg, channelIN)
 
 	if err != errorOK {
 		t.Errorf("Payload should be STOP")
@@ -71,15 +71,15 @@ func TestSubAndManage(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	service, _ := ConnectRedis(redisURL)
+	service, _ := connectRedis(redisURL)
 
-	err := service.Unsubscribe(channelIN)
+	err := service.unsubscribe(channelIN)
 	if fmt.Sprintf("%s", err) != "There is no Subscription to unsubscribe from" {
 		t.Errorf("Unsubscribe should not be able to unsubscribe when there is no subscription")
 	}
 
 	service.subscribe(channelIN)
-	if err = service.Unsubscribe(channelIN); err != nil {
+	if err = service.unsubscribe(channelIN); err != nil {
 		t.Errorf("Unsubscribe should be able to unsubscribe")
 	}
 }
