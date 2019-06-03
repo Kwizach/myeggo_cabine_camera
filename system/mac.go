@@ -47,11 +47,11 @@ func SetMACAddress() error {
 }
 
 func getCurrentMAC() string {
-	res, err := exec.Command("sh", "-c", "ifconfig eth0 | grep eth0 | awk '{print $NF}'").Output()
+	res, err := exec.Command("sh", "-c", "cat /sys/class/net/eth0/address").Output()
 	if err != nil {
 		return ""
 	}
-	return string(res)
+	return strings.TrimSuffix(string(res), "\n")
 }
 
 func createMACFromCPU() (string, error) {
@@ -144,7 +144,7 @@ func setMACAddressNow(mac string) error {
 	}
 
 	// Change MAC Address
-	err = exec.Command("sh", "-c", fmt.Sprintf("ifconfig eth0 hw %s", mac)).Run()
+	err = exec.Command("sh", "-c", fmt.Sprintf("ifconfig eth0 hw ether %s", mac)).Run()
 	if err != nil {
 		return err
 	}

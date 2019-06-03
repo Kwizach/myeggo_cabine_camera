@@ -22,11 +22,11 @@ func TestIsMACAddressFormat(t *testing.T) {
 
 func TestGetCurrentMAC(t *testing.T) {
 	mac := getCurrentMAC()
-	if mac != "" {
-		t.Errorf("Test1 failed")
+	if mac == "" {
+		t.Errorf("Test1 failed: returned empty string")
 	}
 	if !isMACAddressFormat(mac) {
-		t.Errorf("Test2 failed")
+		t.Errorf("Test2 failed received %s", mac)
 	}
 }
 

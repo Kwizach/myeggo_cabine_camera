@@ -14,9 +14,9 @@ func TestMyID(t *testing.T) {
 
 func TestIsHostNameGood(t *testing.T) {
 	if !IsHostNameGood() {
-		goodHostname, err := getCPUSerial()
+		goodHostname, err := getGoodName()
 		if err != nil {
-			t.Errorf("Can't retriever CPUSerial")
+			t.Errorf("Can't retriever getGoodName with error: %s", err)
 			return
 		}
 		t.Errorf("IsHostNameGood should be %s", goodHostname)
