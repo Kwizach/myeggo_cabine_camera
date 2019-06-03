@@ -63,19 +63,19 @@ func TestCreateMACAddress(t *testing.T) {
 
 	res, err := createMACAddress([]string{"00", "4e", "0c", "31"})
 	if res != "" || err == nil {
-		t.Errorf("Test3 failed")
+		t.Errorf("Test3 failed with error: %s", err)
 	}
 
 	res, err = createMACAddress([]string{"00", "4e", "0c", "31", "3g"})
 	if res != "" || err == nil {
-		t.Errorf("Test3 failed")
+		t.Errorf("Test3 failed with error: %s", err)
 	}
 }
 
 func TestCreateMACFromCPU(t *testing.T) {
 	_, err := createMACFromCPU()
 	if err != nil {
-		t.Errorf("Test1 failed")
+		t.Errorf("Test1 failed with error: %s", err)
 	}
 	// every other inner functions have been tested already
 }
@@ -86,12 +86,12 @@ func TestSetMACAddressNow(t *testing.T) {
 
 	err := setMACAddressNow(testMac)
 	if err != nil {
-		t.Errorf("setMacAddressNow returned error")
+		t.Errorf("setMacAddressNow failed with error: %s", err)
 	}
 
 	mac := getCurrentMAC()
 	if mac != testMac {
-		t.Errorf("didn't set Mac as expected")
+		t.Errorf("didn't set Mac as expected received %s expected %s", mac, testMac)
 	}
 
 	// set it back
