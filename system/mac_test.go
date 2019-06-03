@@ -1,7 +1,6 @@
 package system
 
 import (
-	"os/exec"
 	"testing"
 )
 
@@ -83,39 +82,43 @@ func TestCreateMACFromCPU(t *testing.T) {
 }
 
 func TestSetMACAddressNow(t *testing.T) {
-	currentMac, _ := createMACFromCPU()
-	testMac := "e9:90:00:7e:57:00" // eggo test :)
+	// Do not test it for now... too violent ;)
 
-	err := setMACAddressNow(testMac)
-	if err != nil {
-		t.Errorf("setMacAddressNow failed with error: %s", err)
-	}
+	// currentMac, _ := createMACFromCPU()
+	// testMac := "e9:90:00:7e:57:00" // eggo test :)
 
-	mac := getCurrentMAC()
-	if mac != testMac {
-		t.Errorf("didn't set Mac as expected received %s expected %s", mac, testMac)
-	}
+	// err := setMACAddressNow(testMac)
+	// if err != nil {
+	// 	t.Errorf("setMacAddressNow failed with error: %s", err)
+	// }
 
-	// set it back
-	setMACAddressNow(currentMac)
+	// mac := getCurrentMAC()
+	// if mac != testMac {
+	// 	t.Errorf("didn't set Mac as expected received %s expected %s", mac, testMac)
+	// }
+
+	// // set it back
+	// setMACAddressNow(currentMac)
 }
 
 func TestSetMACAddressPermanently(t *testing.T) {
-	currentMac, _ := createMACFromCPU()
-	testMac := "e9:90:00:7e:57:00" // eggo test :)
+	// Do not test it for now... too violent ;)
 
-	if err := setMACAddressInInterfaces("./interfaces", testMac); err != nil {
-		t.Errorf("can't create expected file")
-	}
-	if err := setMACAddressPermanently(testMac); err != nil {
-		t.Errorf("can't create expected file")
-	}
+	// currentMac, _ := createMACFromCPU()
+	// testMac := "e9:90:00:7e:57:00" // eggo test :)
 
-	res, err := exec.Command("sh", "-c", "diff ./interfaces /etc/network/interfaces").Output()
-	if err != nil || string(res) != "" {
-		t.Errorf("files are different")
-	}
+	// if err := setMACAddressInInterfaces("./interfaces", testMac); err != nil {
+	// 	t.Errorf("can't create expected file")
+	// }
+	// if err := setMACAddressPermanently(testMac); err != nil {
+	// 	t.Errorf("can't create expected file")
+	// }
 
-	// set it back
-	setMACAddressPermanently(currentMac)
+	// res, err := exec.Command("sh", "-c", "diff ./interfaces /etc/network/interfaces").Output()
+	// if err != nil || string(res) != "" {
+	// 	t.Errorf("files are different")
+	// }
+
+	// // set it back
+	// setMACAddressPermanently(currentMac)
 }
