@@ -5,10 +5,11 @@ import (
 )
 
 func TestMyID(t *testing.T) {
-	cpuID = "toto"
+	cpuID = "TEST_ID"
 	if MyID() != "rpi-"+cpuID {
 		t.Errorf("MyID should return myID")
 	}
+	cpuID = ""
 }
 
 func TestIsHostNameGood(t *testing.T) {
