@@ -18,7 +18,7 @@ func log(err error) {
 	// Stringify error
 	strErr := fmt.Sprintf("%s", err)
 	//  Get log file URL
-	if logURL != "" {
+	if logURL == "" {
 		getLogURL()
 	}
 
@@ -32,7 +32,7 @@ func log(err error) {
 	defer f.Close()
 
 	// Write to log file
-	_, err = f.WriteString(now + " - " + strErr)
+	_, err = f.WriteString(now + " - " + strErr + "\n")
 	if err != nil {
 		// Error while writting to log file, write to Stderr
 		fmt.Fprintf(os.Stderr, "%s - Error Can't wrtite to %s\nOriginal error: %s", now, logURL, strErr)
