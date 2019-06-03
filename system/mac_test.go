@@ -76,6 +76,8 @@ func TestCreateMACFromCPU(t *testing.T) {
 	_, err := createMACFromCPU()
 	if err != nil {
 		t.Errorf("Test1 failed with error: %s", err)
+		serial, _ := getCPUSerial()
+		t.Logf("serial: %s", serial)
 	}
 	// every other inner functions have been tested already
 }
