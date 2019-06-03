@@ -33,6 +33,7 @@ func SubRedis(rpiID string) error {
 	}
 	// Tell the server that we are listening
 	RpiMsg("Connected")
+	service.incrKey("connected-rpis")
 
 	// Subscribe to channelIN and wait for messages
 	// This function won't exit until there is an error
@@ -41,6 +42,7 @@ func SubRedis(rpiID string) error {
 
 	// Tell the server that we are not listening anymore
 	RpiMsg("Disconnected")
+	service.decrKey("connected-rpis")
 
 	var errorMsg string
 
@@ -90,4 +92,21 @@ func Log(msg string, err error) error {
 		return service.publish(channelLOG, fmt.Sprintf("RPI [%s] - %s %s", myID, msg, err))
 	}
 	return errors.New("Service is down")
+}
+
+// getMyKey retrieve a key from Redis
+// 1st check if we have a dedicated one first
+// if not get the global one
+func getMyKey(key string) (string, error) {
+	dedicatedKey := fmt.Sprintf("%s:%s", myID, key)
+	res, err := service.getKey(dedicatedKey)
+	if res == "" { // dedicatedKey doesn't exist in Redis
+		res, err = service.getKey(key)
+		if res == "" && err == nil { // key doesn't exist
+			return "", nil
+		} else if err != nil {
+			return "", err
+		}
+	}
+	return res, nil
 }

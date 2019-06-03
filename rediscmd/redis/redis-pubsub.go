@@ -2,6 +2,7 @@ package redis
 
 import (
 	"errors"
+	"time"
 
 	"github.com/go-redis/redis"
 )
@@ -86,4 +87,30 @@ func (service *Service) unsubscribe(channels ...string) error {
 // Publish publish key value to a PubSub channel
 func (service *Service) publish(channel string, value string) error {
 	return service.client.Publish(channel, value).Err()
+}
+
+// SetKeyValue retrieve a Key from Redis
+func (service *Service) setKeyValue(key string, value interface{}, howLong time.Duration) error {
+	return service.client.Set(key, value, howLong).Err()
+}
+
+// GetKey retrieve a Key from Redis
+func (service *Service) getKey(key string) (string, error) {
+	val, err := service.client.Get(key).Result()
+	if err == redis.Nil {
+		return "", nil
+	} else if err != nil {
+		return "", err
+	}
+	return val, nil
+}
+
+// IncrKey incrise a key in Redis
+func (service *Service) incrKey(key string) (int64, error) {
+	return service.client.Incr(key).Result()
+}
+
+// DecrKey incrise a key in Redis
+func (service *Service) decrKey(key string) (int64, error) {
+	return service.client.Decr(key).Result()
 }
