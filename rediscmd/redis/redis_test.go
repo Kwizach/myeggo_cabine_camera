@@ -18,8 +18,8 @@ func TestSubRedis(t *testing.T) {
 	}()
 	time.Sleep(2019 * time.Millisecond)
 	if service != nil {
-		service.publish(channelIN, "STOP")
-		service.unsubscribe(channelIN)
+		service.publish(AllSettings["channelIN"], "STOP")
+		service.unsubscribe(AllSettings["channelIN"])
 	}
 
 	if myID != str {
@@ -36,15 +36,15 @@ func TestOnMsg(t *testing.T) {
 		return fmt.Errorf("Success TEST2 %s %s", params[0], params[1])
 	}
 
-	chTIN, errIN := service.subscribe(channelIN)
+	chTIN, errIN := service.subscribe(AllSettings["channelIN"])
 	if errIN != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
-	chTOUT, errOUT := service.subscribe(channelOUT)
+	chTOUT, errOUT := service.subscribe(AllSettings["channelOUT"])
 	if errOUT != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
-	defer service.unsubscribe(channelIN, channelOUT)
+	defer service.unsubscribe(AllSettings["channelIN"], AllSettings["channelOUT"])
 
 	go func() {
 		var (
@@ -91,30 +91,30 @@ func TestOnMsg(t *testing.T) {
 
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
-			service.publish(channelIN, "TEST1")
+			service.publish(AllSettings["channelIN"], "TEST1")
 		})
 		t.Run("Test2", func(t *testing.T) {
-			service.publish(channelIN, "TEST2 is successfull")
+			service.publish(AllSettings["channelIN"], "TEST2 is successfull")
 		})
 		t.Run("Test3", func(t *testing.T) {
-			service.publish(channelIN, "TEST1 with 4 useless parameters")
+			service.publish(AllSettings["channelIN"], "TEST1 with 4 useless parameters")
 		})
 		t.Run("Test4", func(t *testing.T) {
-			service.publish(channelIN, "TEST_UNKNOWN")
+			service.publish(AllSettings["channelIN"], "TEST_UNKNOWN")
 		})
 		t.Run("Test5", func(t *testing.T) {
 			time.Sleep(555 * time.Millisecond)
-			service.publish(channelIN, "")
+			service.publish(AllSettings["channelIN"], "")
 		})
 	})
 }
 
 func TestRpiMsg(t *testing.T) {
-	chTOUT, errOUT := service.subscribe(channelOUT)
+	chTOUT, errOUT := service.subscribe(AllSettings["channelOUT"])
 	if errOUT != nil {
 		t.Errorf("TestRpiMsg can't subscribe")
 	}
-	defer service.unsubscribe(channelOUT)
+	defer service.unsubscribe(AllSettings["channelOUT"])
 
 	time.Sleep(2019 * time.Millisecond)
 	RpiMsg("TEST_MSG")
@@ -125,11 +125,11 @@ func TestRpiMsg(t *testing.T) {
 }
 
 func TestLog(t *testing.T) {
-	chTLOG, errLOG := service.subscribe(channelLOG)
+	chTLOG, errLOG := service.subscribe(AllSettings["channelLOG"])
 	if errLOG != nil {
 		t.Errorf("TestLog can't subscribe")
 	}
-	defer service.unsubscribe(channelLOG)
+	defer service.unsubscribe(AllSettings["channelLOG"])
 
 	time.Sleep(2019 * time.Millisecond)
 	Log("TEST_MSG", errors.New("WITH ERROR"))
@@ -147,13 +147,13 @@ func TestGetMyKey(t *testing.T) {
 	service.setKeyValue(globalKey, "84", 10*time.Second)
 	time.Sleep(2019 * time.Millisecond)
 
-	if val, err := getMyKey(myKey); err != nil || val != "42" {
+	if val, err := GetMyKey(myKey); err != nil || val != "42" {
 		t.Errorf("TEST1 failed expected 42 received %s\n error: %s", val, err)
 	}
-	if val, err := getMyKey(globalKey); err != nil || val != "84" {
+	if val, err := GetMyKey(globalKey); err != nil || val != "84" {
 		t.Errorf("TEST2 failed expected 84 received %s\n error: %s", val, err)
 	}
-	if val, err := getMyKey("unknown_key"); err != nil || val != "" {
+	if val, err := GetMyKey("unknown_key"); err != nil || val != "" {
 		t.Errorf("TEST3 failed expected '' received %s\n error: %s", val, err)
 	}
 }

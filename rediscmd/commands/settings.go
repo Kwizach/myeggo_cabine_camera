@@ -4,12 +4,19 @@ import (
 	"rpi-client/rediscmd/redis"
 )
 
-// allSettings
-var allSettings = make(map[string]string)
+// AllSettings are variable that will be use through out the program
+var AllSettings = make(map[string]string)
 
 func init() {
-	allSettings["shoot_folder"] = "/tmp/shoot"
-	allSettings["photo_ext"] = ".jpg"
+	AllSettings["redis_server"] = "redis://redis.egg:6379/"
+	AllSettings["channelIN"] = "commands"
+	AllSettings["channelOUT"] = "out"
+	AllSettings["channelLOG"] = "log"
+
+	AllSettings["ntpd_server"] = "ntpd.egg"
+
+	AllSettings["shoot_folder"] = "/tmp/shoot"
+	AllSettings["photo_ext"] = ".jpg"
 
 	// NEW_SETTING
 	AllCommands["NEW_SETTING"] = func(args []string) error {
@@ -20,7 +27,7 @@ func init() {
 				return err
 			}
 			if val != "" {
-				allSettings[key] = val
+				AllSettings[key] = val
 			}
 		} else {
 			redis.Log("Received NEW_SETTING with no argument", nil)

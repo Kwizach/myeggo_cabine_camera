@@ -8,7 +8,7 @@ import (
 )
 
 func TestConnectRedis(t *testing.T) {
-	service, err := connectRedis(redisURL)
+	service, err := connectRedis(AllSettings["redisURL"])
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
 			if err != nil {
@@ -24,10 +24,10 @@ func TestConnectRedis(t *testing.T) {
 }
 
 func TestSubscribe(t *testing.T) {
-	service, _ := connectRedis(redisURL)
-	ch, errs := service.subscribe(channelIN)
+	service, _ := connectRedis(AllSettings["redisURL"])
+	ch, errs := service.subscribe(AllSettings["channelIN"])
 
-	service.publish(channelIN, "STOP")
+	service.publish(AllSettings["channelIN"], "STOP")
 	msg := <-ch
 
 	t.Run("group", func(t *testing.T) {
@@ -43,11 +43,11 @@ func TestSubscribe(t *testing.T) {
 		})
 	})
 
-	service.unsubscribe(channelIN)
+	service.unsubscribe(AllSettings["channelIN"])
 }
 
 func TestSubAndManage(t *testing.T) {
-	service, _ := connectRedis(redisURL)
+	service, _ := connectRedis(AllSettings["redisURL"])
 
 	errorOK := errors.New("STOP Listening")
 
@@ -60,10 +60,10 @@ func TestSubAndManage(t *testing.T) {
 
 	go func() {
 		time.Sleep(500 * time.Millisecond)
-		service.publish(channelIN, "STOP")
+		service.publish(AllSettings["channelIN"], "STOP")
 	}()
 
-	err := service.subAndManage(onMsg, channelIN)
+	err := service.subAndManage(onMsg, AllSettings["channelIN"])
 
 	if err != errorOK {
 		t.Errorf("Payload should be STOP")
@@ -71,15 +71,15 @@ func TestSubAndManage(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	service, _ := connectRedis(redisURL)
+	service, _ := connectRedis(AllSettings["redisURL"])
 
-	err := service.unsubscribe(channelIN)
+	err := service.unsubscribe(AllSettings["channelIN"])
 	if fmt.Sprintf("%s", err) != "There is no Subscription to unsubscribe from" {
 		t.Errorf("Unsubscribe should not be able to unsubscribe when there is no subscription")
 	}
 
-	service.subscribe(channelIN)
-	if err = service.unsubscribe(channelIN); err != nil {
+	service.subscribe(AllSettings["channelIN"])
+	if err = service.unsubscribe(AllSettings["channelIN"]); err != nil {
 		t.Errorf("Unsubscribe should be able to unsubscribe")
 	}
 }

@@ -2,6 +2,10 @@ stages:
   - test
   - build
 
+variables:
+  - EGG_REDIS_SERVER: "redis://redis.myeggo.com:6379/"
+  - EGG_NTPD_SERVER: "ntpd.myeggo.com"
+
 before_script:
   - export GOPATH=~/go
   - export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin

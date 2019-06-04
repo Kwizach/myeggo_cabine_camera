@@ -6,19 +6,14 @@ import (
 	"strings"
 )
 
-const (
-	redisURL   string = "redis://redis.myeggo.com:6379/"
-	channelIN  string = "commands"
-	channelOUT string = "out"
-	channelLOG string = "log"
-)
-
 var (
 	myID    string
 	service *Service
 	// AllCommands is a hash table with commands coming from channelIN
 	// and their associated function
 	AllCommands = make(map[string]func(_ []string) error)
+	// AllSettings are variable that will be use through out the program
+	AllSettings = make(map[string]string)
 )
 
 // SubRedis subscribe to Redis pubsub and manage incoming messages
@@ -27,7 +22,7 @@ func SubRedis(rpiID string) error {
 
 	var err error
 	// Connect to Redis
-	service, err = connectRedis(redisURL)
+	service, err = connectRedis(AllSettings["redis_server"])
 	if err != nil {
 		return err
 	}
@@ -36,7 +31,7 @@ func SubRedis(rpiID string) error {
 
 	// Subscribe to channelIN and wait for messages
 	// This function won't exit until there is an error
-	err = service.subAndManage(onMsg, channelIN)
+	err = service.subAndManage(onMsg, AllSettings["channelIN"])
 	Log("subAndManage ended with error", err)
 
 	// Tell the server that we are not listening anymore
@@ -56,7 +51,7 @@ func SubRedis(rpiID string) error {
 }
 
 func onMsg(channel string, message string) error {
-	if channel == channelIN {
+	if channel == AllSettings["channelIN"] {
 		msgs := strings.Split(message, " ")
 		if msgs[0] != "" {
 			if _, ok := AllCommands[msgs[0]]; ok {
@@ -79,7 +74,7 @@ func onMsg(channel string, message string) error {
 // RpiMsg publish a message on channelOUT
 func RpiMsg(msg string) error {
 	if service != nil {
-		return service.publish(channelOUT, fmt.Sprintf("RPI [%s] - %s", myID, msg))
+		return service.publish(AllSettings["channelOUT"], fmt.Sprintf("RPI [%s] - %s", myID, msg))
 	}
 	return errors.New("Service is down")
 }
@@ -88,9 +83,9 @@ func RpiMsg(msg string) error {
 func Log(msg string, err error) error {
 	if service != nil {
 		if err != nil {
-			return service.publish(channelLOG, fmt.Sprintf("RPI [%s] - %s %s", myID, msg, err))
+			return service.publish(AllSettings["channelLOG"], fmt.Sprintf("RPI [%s] - %s %s", myID, msg, err))
 		}
-		return service.publish(channelLOG, fmt.Sprintf("RPI [%s] - %s", myID, msg))
+		return service.publish(AllSettings["channelLOG"], fmt.Sprintf("RPI [%s] - %s", myID, msg))
 	}
 	return errors.New("Service is down")
 }
