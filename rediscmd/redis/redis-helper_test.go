@@ -8,7 +8,8 @@ import (
 )
 
 func TestConnectRedis(t *testing.T) {
-	service, err := connectRedis(AllSettings["redisURL"])
+	t.Log("redis_server", AllSettings["redis_server"])
+	service, err := connectRedis(AllSettings["redis_server"])
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
 			if err != nil {
@@ -24,7 +25,7 @@ func TestConnectRedis(t *testing.T) {
 }
 
 func TestSubscribe(t *testing.T) {
-	service, _ := connectRedis(AllSettings["redisURL"])
+	service, _ := connectRedis(AllSettings["redis_server"])
 	ch, errs := service.subscribe(AllSettings["channelIN"])
 
 	service.publish(AllSettings["channelIN"], "STOP")
@@ -47,7 +48,7 @@ func TestSubscribe(t *testing.T) {
 }
 
 func TestSubAndManage(t *testing.T) {
-	service, _ := connectRedis(AllSettings["redisURL"])
+	service, _ := connectRedis(AllSettings["redis_server"])
 
 	errorOK := errors.New("STOP Listening")
 
@@ -71,7 +72,7 @@ func TestSubAndManage(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	service, _ := connectRedis(AllSettings["redisURL"])
+	service, _ := connectRedis(AllSettings["redis_server"])
 
 	err := service.unsubscribe(AllSettings["channelIN"])
 	if fmt.Sprintf("%s", err) != "There is no Subscription to unsubscribe from" {
