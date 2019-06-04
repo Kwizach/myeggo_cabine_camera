@@ -18,6 +18,7 @@ func TestSubRedis(t *testing.T) {
 	}()
 	time.Sleep(2019 * time.Millisecond)
 	if service != nil {
+		service.publish(channelIN, "STOP")
 		service.unsubscribe(channelIN)
 	}
 
