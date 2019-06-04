@@ -11,13 +11,17 @@ import (
 var AllSettings = make(map[string]string)
 
 func init() {
-	modifySettingsFromEnv()
-
 	for k, v := range commands.AllSettings {
 		AllSettings[k] = v
-		redis.AllSettings[k] = v
 	}
 
+	modifySettingsFromEnv()
+
+	// copy settings
+	for k, v := range AllSettings {
+		redis.AllSettings[k] = v
+	}
+	// copy commands
 	for k, v := range commands.AllCommands {
 		redis.AllCommands[k] = v
 	}
@@ -39,7 +43,7 @@ func modifySettingsFromEnv() {
 	for _, v := range envToCheck {
 		envValue := os.Getenv("EGG_" + strings.ToUpper(v))
 		if envValue != "" {
-			commands.AllSettings[v] = envValue
+			AllSettings[v] = envValue
 		}
 	}
 }
