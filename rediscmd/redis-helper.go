@@ -1,4 +1,4 @@
-package redis
+package rediscmd
 
 import (
 	"errors"
@@ -8,13 +8,13 @@ import (
 )
 
 // Service is a service containing a pool and a connexion
-type Service struct {
+type service struct {
 	client *redis.Client // conn is a redis Pool of connexions
 	pubSub *redis.PubSub // pubsub interface
 }
 
 // ConnectRedis to server and create a service
-func connectRedis(url string) (*Service, error) {
+func connectRedis(url string) (*service, error) {
 	opt, err := redis.ParseURL(url)
 	if err != nil {
 		return nil, errors.New("Connect: Can't parse redis url")
@@ -26,14 +26,14 @@ func connectRedis(url string) (*Service, error) {
 		return nil, errors.New("Connect: Can't ping redis")
 	}
 
-	return &Service{
+	return &service{
 		client: connexion,
 		pubSub: nil,
 	}, nil
 }
 
 // subscribe to channels
-func (service *Service) subscribe(channels ...string) (<-chan *redis.Message, error) {
+func (service *service) subscribe(channels ...string) (<-chan *redis.Message, error) {
 
 	service.pubSub = service.client.Subscribe(channels...)
 
@@ -58,7 +58,7 @@ func (service *Service) subscribe(channels ...string) (<-chan *redis.Message, er
 
 // SubAndManage subscribe and manage incoming messages from subscribed channels
 // Returns when onMsg is not nil (returns an error)
-func (service *Service) subAndManage(onMsg func(string, string) error, channels ...string) error {
+func (service *service) subAndManage(onMsg func(string, string) error, channels ...string) error {
 	ch, err := service.subscribe(channels...)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (service *Service) subAndManage(onMsg func(string, string) error, channels 
 }
 
 // Unsubscribe from channels
-func (service *Service) unsubscribe(channels ...string) error {
+func (service *service) unsubscribe(channels ...string) error {
 	if service.pubSub != nil {
 		//defer service.pubSub.Close()
 		return service.pubSub.Unsubscribe(channels...)
@@ -85,17 +85,17 @@ func (service *Service) unsubscribe(channels ...string) error {
 }
 
 // Publish publish key value to a PubSub channel
-func (service *Service) publish(channel string, value string) error {
+func (service *service) publish(channel string, value string) error {
 	return service.client.Publish(channel, value).Err()
 }
 
 // SetKeyValue retrieve a Key from Redis
-func (service *Service) setKeyValue(key string, value interface{}, howLong time.Duration) error {
+func (service *service) setKeyValue(key string, value interface{}, howLong time.Duration) error {
 	return service.client.Set(key, value, howLong).Err()
 }
 
 // GetKey retrieve a Key from Redis
-func (service *Service) getKey(key string) (string, error) {
+func (service *service) getKey(key string) (string, error) {
 	val, err := service.client.Get(key).Result()
 	if err == redis.Nil {
 		return "", nil
@@ -106,11 +106,11 @@ func (service *Service) getKey(key string) (string, error) {
 }
 
 // IncrKey incrise a key in Redis
-func (service *Service) incrKey(key string) (int64, error) {
+func (service *service) incrKey(key string) (int64, error) {
 	return service.client.Incr(key).Result()
 }
 
 // DecrKey incrise a key in Redis
-func (service *Service) decrKey(key string) (int64, error) {
+func (service *service) decrKey(key string) (int64, error) {
 	return service.client.Decr(key).Result()
 }

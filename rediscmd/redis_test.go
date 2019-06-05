@@ -1,4 +1,4 @@
-package redis
+package rediscmd
 
 import (
 	"errors"
@@ -17,9 +17,9 @@ func TestSubRedis(t *testing.T) {
 		}
 	}()
 	time.Sleep(2019 * time.Millisecond)
-	if service != nil {
-		service.publish(AllSettings["channelIN"], "STOP")
-		service.unsubscribe(AllSettings["channelIN"])
+	if serv != nil {
+		serv.publish(allSettings["channelIN"], "STOP")
+		serv.unsubscribe(allSettings["channelIN"])
 	}
 
 	if myID != str {
@@ -29,22 +29,22 @@ func TestSubRedis(t *testing.T) {
 
 func TestOnMsg(t *testing.T) {
 	errTest1 := errors.New("SUCCESS TEST1")
-	AllCommands["TEST1"] = func(_ []string) error {
+	allCommands["TEST1"] = func(_ []string) error {
 		return errTest1
 	}
-	AllCommands["TEST2"] = func(params []string) error {
+	allCommands["TEST2"] = func(params []string) error {
 		return fmt.Errorf("Success TEST2 %s %s", params[0], params[1])
 	}
 
-	chTIN, errIN := service.subscribe(AllSettings["channelIN"])
+	chTIN, errIN := serv.subscribe(allSettings["channelIN"])
 	if errIN != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
-	chTOUT, errOUT := service.subscribe(AllSettings["channelOUT"])
+	chTOUT, errOUT := serv.subscribe(allSettings["channelOUT"])
 	if errOUT != nil {
 		t.Errorf("TestOnMsg can't subscribe")
 	}
-	defer service.unsubscribe(AllSettings["channelIN"], AllSettings["channelOUT"])
+	defer serv.unsubscribe(allSettings["channelIN"], allSettings["channelOUT"])
 
 	go func() {
 		var (
@@ -91,33 +91,33 @@ func TestOnMsg(t *testing.T) {
 
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
-			service.publish(AllSettings["channelIN"], "TEST1")
+			serv.publish(allSettings["channelIN"], "TEST1")
 		})
 		t.Run("Test2", func(t *testing.T) {
-			service.publish(AllSettings["channelIN"], "TEST2 is successfull")
+			serv.publish(allSettings["channelIN"], "TEST2 is successfull")
 		})
 		t.Run("Test3", func(t *testing.T) {
-			service.publish(AllSettings["channelIN"], "TEST1 with 4 useless parameters")
+			serv.publish(allSettings["channelIN"], "TEST1 with 4 useless parameters")
 		})
 		t.Run("Test4", func(t *testing.T) {
-			service.publish(AllSettings["channelIN"], "TEST_UNKNOWN")
+			serv.publish(allSettings["channelIN"], "TEST_UNKNOWN")
 		})
 		t.Run("Test5", func(t *testing.T) {
 			time.Sleep(555 * time.Millisecond)
-			service.publish(AllSettings["channelIN"], "")
+			serv.publish(allSettings["channelIN"], "")
 		})
 	})
 }
 
 func TestRpiMsg(t *testing.T) {
-	chTOUT, errOUT := service.subscribe(AllSettings["channelOUT"])
+	chTOUT, errOUT := serv.subscribe(allSettings["channelOUT"])
 	if errOUT != nil {
 		t.Errorf("TestRpiMsg can't subscribe")
 	}
-	defer service.unsubscribe(AllSettings["channelOUT"])
+	defer serv.unsubscribe(allSettings["channelOUT"])
 
 	time.Sleep(2019 * time.Millisecond)
-	RpiMsg("TEST_MSG")
+	rpiMsg("TEST_MSG")
 	msgI := <-chTOUT
 	if msgI.Payload != "RPI [TEST] - TEST_MSG" {
 		t.Errorf("rpiMsg failed - received: %s", msgI.Payload)
@@ -125,11 +125,11 @@ func TestRpiMsg(t *testing.T) {
 }
 
 func TestLog(t *testing.T) {
-	chTLOG, errLOG := service.subscribe(AllSettings["channelLOG"])
+	chTLOG, errLOG := serv.subscribe(allSettings["channelLOG"])
 	if errLOG != nil {
 		t.Errorf("TestLog can't subscribe")
 	}
-	defer service.unsubscribe(AllSettings["channelLOG"])
+	defer serv.unsubscribe(allSettings["channelLOG"])
 
 	time.Sleep(2019 * time.Millisecond)
 	Log("TEST_MSG", errors.New("WITH ERROR"))
@@ -143,17 +143,17 @@ func TestGetMyKey(t *testing.T) {
 	myKey := "clef:test"
 	globalKey := "clef:test2"
 
-	service.setKeyValue(myID+":"+myKey, "42", 10*time.Second)
-	service.setKeyValue(globalKey, "84", 10*time.Second)
+	serv.setKeyValue(myID+":"+myKey, "42", 10*time.Second)
+	serv.setKeyValue(globalKey, "84", 10*time.Second)
 	time.Sleep(2019 * time.Millisecond)
 
-	if val, err := GetMyKey(myKey); err != nil || val != "42" {
+	if val, err := getMyKey(myKey); err != nil || val != "42" {
 		t.Errorf("TEST1 failed expected 42 received %s\n error: %s", val, err)
 	}
-	if val, err := GetMyKey(globalKey); err != nil || val != "84" {
+	if val, err := getMyKey(globalKey); err != nil || val != "84" {
 		t.Errorf("TEST2 failed expected 84 received %s\n error: %s", val, err)
 	}
-	if val, err := GetMyKey("unknown_key"); err != nil || val != "" {
+	if val, err := getMyKey("unknown_key"); err != nil || val != "" {
 		t.Errorf("TEST3 failed expected '' received %s\n error: %s", val, err)
 	}
 }

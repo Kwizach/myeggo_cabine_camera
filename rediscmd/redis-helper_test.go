@@ -1,4 +1,4 @@
-package redis
+package rediscmd
 
 import (
 	"errors"
@@ -8,7 +8,8 @@ import (
 )
 
 func TestConnectRedis(t *testing.T) {
-	service, err := connectRedis(AllSettings["redis_server"])
+	fmt.Println(allSettings)
+	service, err := connectRedis(allSettings["redis_server"])
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
 			if err != nil {
@@ -24,10 +25,10 @@ func TestConnectRedis(t *testing.T) {
 }
 
 func TestSubscribe(t *testing.T) {
-	service, _ := connectRedis(AllSettings["redis_server"])
-	ch, errs := service.subscribe(AllSettings["channelIN"])
+	service, _ := connectRedis(allSettings["redis_server"])
+	ch, errs := service.subscribe(allSettings["channelIN"])
 
-	service.publish(AllSettings["channelIN"], "STOP")
+	service.publish(allSettings["channelIN"], "STOP")
 	msg := <-ch
 
 	t.Run("group", func(t *testing.T) {
@@ -43,11 +44,11 @@ func TestSubscribe(t *testing.T) {
 		})
 	})
 
-	service.unsubscribe(AllSettings["channelIN"])
+	service.unsubscribe(allSettings["channelIN"])
 }
 
 func TestSubAndManage(t *testing.T) {
-	service, _ := connectRedis(AllSettings["redis_server"])
+	service, _ := connectRedis(allSettings["redis_server"])
 
 	errorOK := errors.New("STOP Listening")
 
@@ -60,10 +61,10 @@ func TestSubAndManage(t *testing.T) {
 
 	go func() {
 		time.Sleep(500 * time.Millisecond)
-		service.publish(AllSettings["channelIN"], "STOP")
+		service.publish(allSettings["channelIN"], "STOP")
 	}()
 
-	err := service.subAndManage(onMsg, AllSettings["channelIN"])
+	err := service.subAndManage(onMsg, allSettings["channelIN"])
 
 	if err != errorOK {
 		t.Errorf("Payload should be STOP")
@@ -71,15 +72,15 @@ func TestSubAndManage(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	service, _ := connectRedis(AllSettings["redis_server"])
+	service, _ := connectRedis(allSettings["redis_server"])
 
-	err := service.unsubscribe(AllSettings["channelIN"])
+	err := service.unsubscribe(allSettings["channelIN"])
 	if fmt.Sprintf("%s", err) != "There is no Subscription to unsubscribe from" {
 		t.Errorf("Unsubscribe should not be able to unsubscribe when there is no subscription")
 	}
 
-	service.subscribe(AllSettings["channelIN"])
-	if err = service.unsubscribe(AllSettings["channelIN"]); err != nil {
+	service.subscribe(allSettings["channelIN"])
+	if err = service.unsubscribe(allSettings["channelIN"]); err != nil {
 		t.Errorf("Unsubscribe should be able to unsubscribe")
 	}
 }

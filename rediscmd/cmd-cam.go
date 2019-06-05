@@ -1,11 +1,11 @@
-package commands
+package rediscmd
 
 import (
 	"fmt"
 )
 
 func init() {
-	AllCommands["SHOOT"] = func(args []string) error { return shoot(args) }
+	allCommands["SHOOT"] = func(args []string) error { return shoot(args) }
 }
 
 // shoot photo with camera and store it localy first

@@ -26,5 +26,6 @@ func main() {
 	//		* 'commands' channel from the server
 	//		* 'out' channel to the server
 	//		* 'log' channel to the server
+	// the only way this function exit is with an error... log it...
 	log(rediscmd.SubRedis(system.MyID()))
 }
