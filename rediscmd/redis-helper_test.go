@@ -8,7 +8,6 @@ import (
 )
 
 func TestConnectRedis(t *testing.T) {
-	fmt.Println(allSettings)
 	service, err := connectRedis(allSettings["redis_server"])
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {

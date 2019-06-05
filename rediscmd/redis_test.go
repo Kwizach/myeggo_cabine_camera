@@ -16,9 +16,9 @@ func TestSubRedis(t *testing.T) {
 			t.Errorf("SubRedis returned with error")
 		}
 	}()
-	time.Sleep(2019 * time.Millisecond)
+	time.Sleep(3019 * time.Millisecond)
 	if serv != nil {
-		serv.publish(allSettings["channelIN"], "STOP")
+		//serv.publish(allSettings["channelIN"], "STOP")
 		serv.unsubscribe(allSettings["channelIN"])
 	}
 
@@ -87,7 +87,7 @@ func TestOnMsg(t *testing.T) {
 			}
 		}
 	}()
-	time.Sleep(2019 * time.Millisecond)
+	time.Sleep(3019 * time.Millisecond)
 
 	t.Run("group", func(t *testing.T) {
 		t.Run("Test1", func(t *testing.T) {
@@ -116,7 +116,7 @@ func TestRpiMsg(t *testing.T) {
 	}
 	defer serv.unsubscribe(allSettings["channelOUT"])
 
-	time.Sleep(2019 * time.Millisecond)
+	time.Sleep(3019 * time.Millisecond)
 	rpiMsg("TEST_MSG")
 	msgI := <-chTOUT
 	if msgI.Payload != "RPI [TEST] - TEST_MSG" {
@@ -131,7 +131,7 @@ func TestLog(t *testing.T) {
 	}
 	defer serv.unsubscribe(allSettings["channelLOG"])
 
-	time.Sleep(2019 * time.Millisecond)
+	time.Sleep(3019 * time.Millisecond)
 	Log("TEST_MSG", errors.New("WITH ERROR"))
 	msgI := <-chTLOG
 	if msgI.Payload != "RPI [TEST] - TEST_MSG WITH ERROR" {
@@ -145,7 +145,7 @@ func TestGetMyKey(t *testing.T) {
 
 	serv.setKeyValue(myID+":"+myKey, "42", 10*time.Second)
 	serv.setKeyValue(globalKey, "84", 10*time.Second)
-	time.Sleep(2019 * time.Millisecond)
+	time.Sleep(3019 * time.Millisecond)
 
 	if val, err := getMyKey(myKey); err != nil || val != "42" {
 		t.Errorf("TEST1 failed expected 42 received %s\n error: %s", val, err)
